@@ -41,6 +41,7 @@ const questionFour = {
 
 const questions = [questionOne, questionTwo, questionThree, questionFour];
 const userAnswer = ['В Африке', '30 км/ч', 9, '50 лет'];
+let num = 0;
 
 //Задание прошлого урока
 
@@ -54,11 +55,12 @@ const userAnswer = ['В Африке', '30 км/ч', 9, '50 лет'];
 function checkAnswer(arr) {
   for (let i = 0; i < arr.length; i++) {
     if (arr[i] === questions[i].currectAnswer) {
-      console.log(`На вопрос '${questions[i].question}' вы ответили правильно!`);
-    } else {
-      console.log(`На вопрос '${questions[i].question}' ответ неверный :(`);
+      num++;
     }
   }
+
+  let q = document.getElementById('question');
+  q.innerHTML = `Число правильных ответов ${num}`;
 }
 
 checkAnswer(userAnswer);
