@@ -98,9 +98,13 @@ previous.addEventListener("click", () => {
   if (countSlide <= 0) {
     return;
   }
+  if (countSlide != 2) {
+   next.textContent = 'next';
+  }
 
   showResult(countSlide - 1);
   countSlide--;
+  console.log(countSlide + 1);
 })
 
 function showResult(switchedSlide) {
