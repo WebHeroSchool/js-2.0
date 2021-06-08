@@ -40,17 +40,17 @@ const questionFour = {
 };
 
 const questions = [questionOne, questionTwo, questionThree, questionFour];
+// Рандомные ответы для проверки счетчика
 const userAnswer = ['В Африке', '30 км/ч', 9, '50 лет'];
 let num = 0;
 
 //Задание прошлого урока
-
-/* questions.map(obj => {
+/*
+questions.map(obj => {
   if (obj.currectAnswer === obj.answer.c) {
     console.log(obj.currectAnswer);
   }
-});
- */
+}); */
 
 function checkAnswer(arr) {
   for (let i = 0; i < arr.length; i++) {
@@ -58,9 +58,52 @@ function checkAnswer(arr) {
       num++;
     }
   }
-
-  let q = document.getElementById('question');
+  let q = document.getElementById('counterAnswers');
   q.innerHTML = `Число правильных ответов ${num}`;
 }
 
-checkAnswer(userAnswer);
+const slides = document.querySelectorAll('.question');
+const next = document.getElementById('next');
+const previous = document.getElementById('previous');
+const start = document.querySelector('.start-btn');
+let countSlide = 0;
+
+start.addEventListener("click", () => {
+  start.classList.add('none');
+  next.classList.remove('none');
+  previous.classList.remove('none');
+  slides[0].classList.add('active');
+
+  console.log(countSlide + 1);
+})
+
+next.addEventListener("click", () => {
+  if (countSlide === 2) {
+    next.textContent = 'check';
+  }
+  if (countSlide === 3) {
+    slides[3].classList.remove('active');
+    next.classList.add('none');
+    previous.classList.add('none');
+    checkAnswer(userAnswer);
+    return;
+  }
+
+  showResult(countSlide + 1);
+  countSlide++;
+  console.log(countSlide + 1);
+})
+
+previous.addEventListener("click", () => {
+  if (countSlide <= 0) {
+    return;
+  }
+
+  showResult(countSlide - 1);
+  countSlide--;
+})
+
+function showResult(switchedSlide) {
+  slides[countSlide].classList.remove('active');
+  slides[switchedSlide].classList.add('active');
+}

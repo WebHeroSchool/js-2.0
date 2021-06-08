@@ -3,9 +3,100 @@
   <head>
     <meta charset="utf-8">
     <title>Игра</title>
+    <link href="style.css" rel="stylesheet">
   </head>
   <body>
-    <h1 id="question"></h1>
+    <h1 class="title">Викторина про жирафов</h1>
+    <p id="counterAnswers"></p>
+    <button class="start-btn">
+      Начать игру
+    </button>
+    <div class="container">
+      <div class="question">
+        <h2 class="question__title">
+          Где обитает жираф?
+        </h2>
+        <div class="question__answers">
+          <p class="answer">
+            В Индии
+          </p>
+          <p class="answer">
+            В Америке
+          </p>
+          <p class="answer">
+            В Африке
+          </p>
+          <p class="answer">
+            В Австралии
+          </p>
+        </div>
+      </div>
+      <div class="question">
+        <h2 class="question__title">
+          Как быстро может бегать жираф?
+        </h2>
+        <div class="question__answers">
+          <p class="answer">
+            70 км/ч
+          </p>
+          <p class="answer">
+            55 км/ч
+          </p>
+          <p class="answer">
+            30 км/ч
+          </p>
+          <p class="answer">
+            100 км/ч
+          </p>
+        </div>
+      </div>
+      <div class="question">
+        <h2 class="question__title">
+          Сколько подвидов жирафа существует?
+        </h2>
+        <div class="question__answers">
+          <p class="answer">
+            9
+          </p>
+          <p class="answer">
+            7
+          </p>
+          <p class="answer">
+            10
+          </p>
+          <p class="answer">
+            17
+          </p>
+        </div>
+      </div>
+      <div class="question">
+        <h2 class="question__title">
+          Сколько живет жираф?
+        </h2>
+        <div class="question__answers">
+          <p class="answer">
+            50 лет
+          </p>
+          <p class="answer">
+            90 лет
+          </p>
+          <p class="answer">
+            30 лет
+          </p>
+          <p class="answer">
+            70 лет
+          </p>
+        </div>
+      </div>
+      <button class="btn btn_prev none" id="previous">
+        previous
+      </button>
+      <button class="btn btn_next none" id="next">
+        next
+      </button>
+    </div>
+
     <script src="js/scripts.js"></script>
   </body>
+
 </html>
