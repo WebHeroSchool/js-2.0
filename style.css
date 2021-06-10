@@ -45,7 +45,8 @@ body {
 }
 
 .radio {
-  display: none;
+  opacity: 0;
+  position: absolute;
 }
 
 .answer {
