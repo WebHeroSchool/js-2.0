@@ -44,6 +44,10 @@ body {
   width: 100%;
 }
 
+.radio {
+  display: none;
+}
+
 .answer {
   width: 40%;
   background: #ffff2b;
