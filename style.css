@@ -37,6 +37,12 @@ body {
   transition: opacity 0.5s;
 }
 
+.form {
+  display: inline-block;
+  text-align: center;
+  transition: none;
+}
+
 .question__answers {
   display: flex;
   flex-wrap: wrap;
@@ -68,7 +74,7 @@ body {
 }
 
 .btn_next {
-  left: 88%;
+  left: 100%;
 }
 
 .active {
