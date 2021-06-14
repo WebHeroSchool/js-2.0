@@ -12,7 +12,8 @@ body {
   font-size: 60px;
 }
 
-.start-btn {
+.start-btn,
+.restart {
   width: 100%;
   border: none;
   font-size: 40px;

@@ -2,6 +2,7 @@ const slides = document.querySelectorAll('.question');
 const next = document.getElementById('next');
 const previous = document.getElementById('previous');
 const start = document.querySelector('.start-btn');
+const restart = document.querySelector('.restart');
 const container = document.querySelector('.container');
 const form = document.querySelector('.form');
 const formName = document.querySelector('.form__name');
@@ -9,7 +10,7 @@ const buttonName = document.querySelector('.form__btn');
 const regex = /(^[A-Z]{1}[a-z]{1,9}( )?$)|(^[А-Я]{1}[а-я]{1,9}( )?$)/;
 let countSlide = 0;
 let countAnswers = 0;
-let isCorrect = null;
+let timerId;
 
 start.addEventListener("click", () => {
   start.classList.add('none');
@@ -36,7 +37,7 @@ function checkResult(event) {
 
   const correctAnswers = ['В Африке', '55 км/ч', '9', '30 лет'];
   let answer = target.previousElementSibling.value;
-  isCorrect = correctAnswers.includes(answer);
+  let isCorrect = correctAnswers.includes(answer);
   if (isCorrect) {
     target.style.background = "green";
     countAnswers++;
@@ -46,8 +47,9 @@ function checkResult(event) {
 
   event.currentTarget.removeEventListener("click", checkResult);
 
-  setTimeout(switchNextQuestion, 1000);
-  isCorrect = null;
+  clearTimeout(timerId);
+
+  let timer = setTimeout(switchNextQuestion, 1000);
 }
 
 function disableButton(event) {
@@ -55,8 +57,10 @@ function disableButton(event) {
     const button = event.currentTarget.querySelectorAll('.radio');
     button.forEach(item => item.setAttribute("disabled", "disabled"));
   } else {
-    const btn = slides[countSlide].querySelectorAll('.radio');
-    Array.from(btn).forEach(item => item.setAttribute("disabled", "disabled"));
+    const disableBtn = slides[countSlide].querySelectorAll('.radio');
+    Array.from(disableBtn).forEach(item => item.setAttribute("disabled", "disabled"));
+    const disableAnswers = slides[countSlide].querySelector('.question__answers');
+    disableAnswers.removeEventListener("click", checkResult);
   }
 }
 
@@ -99,18 +103,16 @@ function switchQuestion(switchedSlide) {
   slides[countSlide].classList.remove('active');
   slides[switchedSlide].classList.add('active');
 
-  let timer;
-  if (timer !== null) clearTimeout(timer);
-  if (countSlide < slides.length - 1 && isCorrect === null) {
-    timer = setTimeout(() => {
-      console.log('Таймер');
-      switchNextQuestion();
+  if (timerId !== null) clearTimeout(timerId);
+  if (countSlide !== 3) {
+    timerId = setTimeout(() => {
       disableButton();
+      switchNextQuestion();
     }, 10000);
   }
 }
 
-buttonName.addEventListener("click", function(event) {
+buttonName.addEventListener("click", () => {
   let name = formName.value;
   if (!regex.test(name)) {
     let err = document.createElement('p');
@@ -121,10 +123,20 @@ buttonName.addEventListener("click", function(event) {
   } else {
     slides[4].classList.remove('active');
     showResult(name);
+    restart.classList.remove('none');
   }
-})
+});
 
 function showResult(name) {
   let counterAnswers = document.getElementById('counterAnswers');
+  counterAnswers.classList.remove('none');
   counterAnswers.innerHTML = `Число правильных ответов игрока ${name} ${countAnswers}`;
 }
+
+restart.addEventListener("click", () => {
+  restart.classList.add('none');
+  counterAnswers.classList.add('none');
+  start.classList.remove('none');
+  countSlide = 0;
+  counterAnswers = 0;
+});
