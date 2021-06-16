@@ -12,6 +12,41 @@ let countSlide = 0;
 let countAnswers = 0;
 let timerId;
 
+let result = [];
+let correctAns = [];
+let question = [];
+const allAnswers = [];
+let url = 'https://opentdb.com/api.php?amount=4&category=27&type=multiple';
+fetch(url)
+  .then(res => res.json())
+  .then(json => {
+    result = json.results;
+    result.forEach(obj => {
+      correctAns.push(obj.correct_answer);
+      question.push(obj.question);
+      allAnswers.push(...obj.incorrect_answers, obj.correct_answer);
+    });
+
+    document.querySelector('.title').textContent = 'Викторина о животных';
+    
+    changeText(question, allAnswers);
+  })
+  .catch(err => console.log(err));
+
+  function changeText(arrQuestion, arrAnswer) {
+    const questionText = container.querySelectorAll('.question__title');
+    for(let i = 0; i < arrQuestion.length; i++) {
+      questionText[i].textContent = arrQuestion[i];
+    }
+
+    const answerText = container.querySelectorAll('.answer');
+    const valueText = container.querySelectorAll('.radio');
+    for(let i = 0; i < arrAnswer.length; i++) {
+      answerText[i].textContent = arrAnswer[i];
+      valueText[i].value = arrAnswer[i];
+    }
+  }
+
 start.addEventListener("click", () => {
   start.classList.add('none');
   next.classList.remove('none');
@@ -35,7 +70,7 @@ function checkResult(event) {
 
   disableButton(event);
 
-  const correctAnswers = ['В Африке', '55 км/ч', '9', '30 лет'];
+  const correctAnswers = ['В Африке', '55 км/ч', '9', '30 лет', ...correctAns];
   let answer = target.previousElementSibling.value;
   let isCorrect = correctAnswers.includes(answer);
   if (isCorrect) {
