@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html>
+
   <head>
     <meta charset="utf-8">
     <title>Игра</title>
     <link href="style.css" rel="stylesheet">
   </head>
+
   <body>
     <h1 class="title">Викторина про жирафов</h1>
     <p id="counterAnswers"></p>
@@ -17,18 +19,22 @@
           Где обитает жираф?
         </h2>
         <div class="question__answers">
-          <p class="answer">
+          <input id="ans1-1" type="radio" value="В Индии" class="radio">
+          <label for="ans1-1" class="answer">
             В Индии
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans1-2" type="radio" value="В Америке" class="radio">
+          <label for="ans1-2" class="answer">
             В Америке
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans1-3" type="radio" value="В Африке" class="radio">
+          <label for="ans1-3" class="answer">
             В Африке
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans1-4" type="radio" value="В Австралии" class="radio">
+          <label for="ans1-4" class="answer">
             В Австралии
-          </p>
+          </label>
         </div>
       </div>
       <div class="question">
@@ -36,18 +42,22 @@
           Как быстро может бегать жираф?
         </h2>
         <div class="question__answers">
-          <p class="answer">
+          <input id="ans2-1" type="radio" value="70км/ч" class="radio">
+          <label for="ans2-1" class="answer">
             70 км/ч
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans2-2" type="radio" value="55 км/ч" class="radio">
+          <label for="ans2-2" class="answer">
             55 км/ч
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans2-3" type="radio" value="90 км/ч" class="radio">
+          <label for="ans2-3" class="answer">
             30 км/ч
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans2-4" type="radio" value="100 км/ч" class="radio">
+          <label for="ans2-4" class="answer">
             100 км/ч
-          </p>
+          </label>
         </div>
       </div>
       <div class="question">
@@ -55,18 +65,22 @@
           Сколько подвидов жирафа существует?
         </h2>
         <div class="question__answers">
-          <p class="answer">
+          <input id="ans3-1" type="radio" value="9" class="radio">
+          <label for="ans3-1" class="answer">
             9
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans3-2" type="radio" value="7" class="radio">
+          <label for="ans3-2" class="answer">
             7
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans3-3" type="radio" value="10" class="radio">
+          <label for="ans3-3" class="answer">
             10
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans3-4" type="radio" value="17" class="radio">
+          <label for="ans3-4" class="answer">
             17
-          </p>
+          </label>
         </div>
       </div>
       <div class="question">
@@ -74,25 +88,36 @@
           Сколько живет жираф?
         </h2>
         <div class="question__answers">
-          <p class="answer">
+          <input id="ans4-1" type="radio" value="50 лет" class="radio">
+          <label for="ans4-1" class="answer">
             50 лет
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans4-2" type="radio" value="90 лет" class="radio">
+          <label for="ans4-2" class="answer">
             90 лет
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans4-3" type="radio" value="30 лет" class="radio">
+          <label for="ans4-3" class="answer">
             30 лет
-          </p>
-          <p class="answer">
+          </label>
+          <input id="ans4-4" type="radio" value="70 лет" class="radio">
+          <label for="ans4-4" class="answer">
             70 лет
-          </p>
+          </label>
         </div>
       </div>
+      <form action="#" class="form question">
+        <input class="form__name" type="text" name="name" placeHolder="Ваше имя" autocomplete="off">
+        <button class="form__btn" type="button">Отправить</button>
+      </form>
       <button class="btn btn_prev none" id="previous">
         previous
       </button>
       <button class="btn btn_next none" id="next">
         next
+      </button>
+      <button class="restart none">
+        Рестарт
       </button>
     </div>
 

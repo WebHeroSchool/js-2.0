@@ -1,113 +1,142 @@
-const questionOne = {
-  question: 'Где обитает жираф?',
-  answer: {
-    a: 'В Индии',
-    b: 'В Америке',
-    c: 'В Африке',
-    d: 'В Австралии'
-  },
-  currectAnswer: 'В Африке'
-};
-const questionTwo = {
-  question: 'Как быстро может бегать жираф?',
-  answer: {
-    a: '70 км/ч',
-    b: '55 км/ч',
-    c: '30 км/ч',
-    d: '100 км/ч'
-  },
-  currectAnswer: '55 км/ч'
-};
-const questionThree = {
-  question: 'Сколько подвидов жирафа существует?',
-  answer: {
-    a: 9,
-    b: 7,
-    c: 10,
-    d: 17
-  },
-  currectAnswer: 9
-};
-const questionFour = {
-  question: 'Сколько живет жираф?',
-  answer: {
-    a: '50 лет',
-    b: '90 лет',
-    c: '30 лет',
-    d: '70 лет'
-  },
-  currectAnswer: '30 лет'
-};
-
-const questions = [questionOne, questionTwo, questionThree, questionFour];
-// Рандомные ответы для проверки счетчика
-const userAnswer = ['В Африке', '30 км/ч', 9, '50 лет'];
-let num = 0;
-
-//Задание прошлого урока
-/*
-questions.map(obj => {
-  if (obj.currectAnswer === obj.answer.c) {
-    console.log(obj.currectAnswer);
-  }
-}); */
-
-function checkAnswer(arr) {
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === questions[i].currectAnswer) {
-      num++;
-    }
-  }
-  let q = document.getElementById('counterAnswers');
-  q.innerHTML = `Число правильных ответов ${num}`;
-}
-
 const slides = document.querySelectorAll('.question');
 const next = document.getElementById('next');
 const previous = document.getElementById('previous');
 const start = document.querySelector('.start-btn');
+const restart = document.querySelector('.restart');
+const container = document.querySelector('.container');
+const form = document.querySelector('.form');
+const formName = document.querySelector('.form__name');
+const buttonName = document.querySelector('.form__btn');
+const regex = /(^[A-Z]{1}[a-z]{1,9}( )?$)|(^[А-Я]{1}[а-я]{1,9}( )?$)/;
 let countSlide = 0;
+let countAnswers = 0;
+let timerId;
 
 start.addEventListener("click", () => {
   start.classList.add('none');
   next.classList.remove('none');
   previous.classList.remove('none');
-  slides[0].classList.add('active');
-
+  switchQuestion(countAnswers);
   console.log(countSlide + 1);
 })
 
-next.addEventListener("click", () => {
+let assignHandler = () => {
+  Array.from(container.querySelectorAll('.question .question__answers'))
+    .forEach(answers => {
+      answers.addEventListener("click", checkResult);
+    })
+}
+
+assignHandler();
+
+function checkResult(event) {
+  let target = event.target;
+  if (target.tagName != 'LABEL') return;
+
+  disableButton(event);
+
+  const correctAnswers = ['В Африке', '55 км/ч', '9', '30 лет'];
+  let answer = target.previousElementSibling.value;
+  let isCorrect = correctAnswers.includes(answer);
+  if (isCorrect) {
+    target.style.background = "green";
+    countAnswers++;
+  } else {
+    target.style.background = "red";
+  }
+
+  event.currentTarget.removeEventListener("click", checkResult);
+
+  clearTimeout(timerId);
+
+  let timer = setTimeout(switchNextQuestion, 1000);
+}
+
+function disableButton(event) {
+  if (event) {
+    const button = event.currentTarget.querySelectorAll('.radio');
+    button.forEach(item => item.setAttribute("disabled", "disabled"));
+  } else {
+    const disableBtn = slides[countSlide].querySelectorAll('.radio');
+    Array.from(disableBtn).forEach(item => item.setAttribute("disabled", "disabled"));
+    const disableAnswers = slides[countSlide].querySelector('.question__answers');
+    disableAnswers.removeEventListener("click", checkResult);
+  }
+}
+
+next.addEventListener("click", switchNextQuestion);
+
+function switchNextQuestion() {
   if (countSlide === 2) {
     next.textContent = 'check';
   }
+
   if (countSlide === 3) {
-    slides[3].classList.remove('active');
     next.classList.add('none');
     previous.classList.add('none');
-    checkAnswer(userAnswer);
-    return;
   }
 
-  showResult(countSlide + 1);
+  if (countSlide === 4) return;
+
+  switchQuestion(countSlide + 1);
   countSlide++;
   console.log(countSlide + 1);
-})
+}
 
-previous.addEventListener("click", () => {
+previous.addEventListener("click", switchPreviousQuestion);
+
+function switchPreviousQuestion() {
   if (countSlide <= 0) {
     return;
   }
+
   if (countSlide != 2) {
-   next.textContent = 'next';
+    next.textContent = 'next';
   }
 
-  showResult(countSlide - 1);
+  switchQuestion(countSlide - 1);
   countSlide--;
   console.log(countSlide + 1);
-})
+}
 
-function showResult(switchedSlide) {
+function switchQuestion(switchedSlide) {
   slides[countSlide].classList.remove('active');
   slides[switchedSlide].classList.add('active');
+
+  if (timerId !== null) clearTimeout(timerId);
+  if (countSlide !== 3) {
+    timerId = setTimeout(() => {
+      disableButton();
+      switchNextQuestion();
+    }, 10000);
+  }
 }
+
+buttonName.addEventListener("click", () => {
+  let name = formName.value;
+  if (!regex.test(name)) {
+    let err = document.createElement('p');
+    err.classList.add('error');
+    err.textContent = 'Введите корректное имя(содержит 2-10 символов и начинается с заглавной буквы)';
+    form.append(err);
+    name = '';
+  } else {
+    slides[4].classList.remove('active');
+    showResult(name);
+    restart.classList.remove('none');
+  }
+});
+
+function showResult(name) {
+  let counterAnswers = document.getElementById('counterAnswers');
+  counterAnswers.classList.remove('none');
+  counterAnswers.innerHTML = `Число правильных ответов игрока ${name} ${countAnswers}`;
+}
+
+restart.addEventListener("click", () => {
+  restart.classList.add('none');
+  counterAnswers.classList.add('none');
+  start.classList.remove('none');
+  countSlide = 0;
+  counterAnswers = 0;
+});
