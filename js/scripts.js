@@ -10,7 +10,8 @@ const buttonName = document.querySelector('.form__btn');
 const regex = /(^[A-Z]{1}[a-z]{1,9}( )?$)|(^[А-Я]{1}[а-я]{1,9}( )?$)/;
 let countSlide = 0;
 let countAnswers = 0;
-let timerId;
+let timerShowQuestion;
+let timerCheckQuestion;
 
 start.addEventListener("click", () => {
   start.classList.add('none');
@@ -47,9 +48,9 @@ function checkResult(event) {
 
   event.currentTarget.removeEventListener("click", checkResult);
 
-  clearTimeout(timerId);
+  clearTimeout(timerShowQuestion);
 
-  let timer = setTimeout(switchNextQuestion, 1000);
+  timerCheckQuestion = setTimeout(switchNextQuestion, 1500);
 }
 
 function disableButton(event) {
@@ -81,6 +82,7 @@ function switchNextQuestion() {
   switchQuestion(countSlide + 1);
   countSlide++;
   console.log(countSlide + 1);
+  clearTimeout(timerCheckQuestion);
 }
 
 previous.addEventListener("click", switchPreviousQuestion);
@@ -103,9 +105,9 @@ function switchQuestion(switchedSlide) {
   slides[countSlide].classList.remove('active');
   slides[switchedSlide].classList.add('active');
 
-  if (timerId !== null) clearTimeout(timerId);
+  if (timerShowQuestion !== null) clearTimeout(timerShowQuestion);
   if (countSlide !== 3) {
-    timerId = setTimeout(() => {
+    timerShowQuestion = setTimeout(() => {
       disableButton();
       switchNextQuestion();
     }, 10000);

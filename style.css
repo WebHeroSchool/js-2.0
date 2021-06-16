@@ -14,14 +14,11 @@ body {
 
 .start-btn,
 .restart {
+  z-index: 10;
   width: 100%;
   border: none;
   font-size: 40px;
   background: #abcdef;
-}
-
-.restart {
-  z-index: 10;
 }
 
 .container {
