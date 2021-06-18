@@ -7,10 +7,12 @@ const container = document.querySelector('.container');
 const form = document.querySelector('.form');
 const formName = document.querySelector('.form__name');
 const buttonName = document.querySelector('.form__btn');
+const counterAnswers = document.getElementById('counterAnswers');
 const regex = /(^[A-Z]{1}[a-z]{1,9}( )?$)|(^[А-Я]{1}[а-я]{1,9}( )?$)/;
 let countSlide = 0;
 let countAnswers = 0;
-let timerId;
+let timerShowQuestion;
+let timerCheckQuestion;
 
 let result = [];
 let correctAns = [];
@@ -28,7 +30,7 @@ fetch(url)
     });
 
     document.querySelector('.title').textContent = 'Викторина о животных';
-    
+
     changeText(question, allAnswers);
   })
   .catch(err => console.log(err));
@@ -82,9 +84,9 @@ function checkResult(event) {
 
   event.currentTarget.removeEventListener("click", checkResult);
 
-  clearTimeout(timerId);
+  clearTimeout(timerShowQuestion);
 
-  let timer = setTimeout(switchNextQuestion, 1000);
+  timerCheckQuestion = setTimeout(switchNextQuestion, 1500);
 }
 
 function disableButton(event) {
@@ -116,6 +118,7 @@ function switchNextQuestion() {
   switchQuestion(countSlide + 1);
   countSlide++;
   console.log(countSlide + 1);
+  clearTimeout(timerCheckQuestion);
 }
 
 previous.addEventListener("click", switchPreviousQuestion);
@@ -138,9 +141,9 @@ function switchQuestion(switchedSlide) {
   slides[countSlide].classList.remove('active');
   slides[switchedSlide].classList.add('active');
 
-  if (timerId !== null) clearTimeout(timerId);
+  if (timerShowQuestion !== null) clearTimeout(timerShowQuestion);
   if (countSlide !== 3) {
-    timerId = setTimeout(() => {
+    timerShowQuestion = setTimeout(() => {
       disableButton();
       switchNextQuestion();
     }, 10000);
@@ -149,21 +152,21 @@ function switchQuestion(switchedSlide) {
 
 buttonName.addEventListener("click", () => {
   let name = formName.value;
+  let err = document.createElement('p');
   if (!regex.test(name)) {
-    let err = document.createElement('p');
     err.classList.add('error');
     err.textContent = 'Введите корректное имя(содержит 2-10 символов и начинается с заглавной буквы)';
     form.append(err);
-    name = '';
   } else {
     slides[4].classList.remove('active');
     showResult(name);
     restart.classList.remove('none');
   }
+   setTimeout(() => err.remove(), 2000);
+   formName.value = null;
 });
 
 function showResult(name) {
-  let counterAnswers = document.getElementById('counterAnswers');
   counterAnswers.classList.remove('none');
   counterAnswers.innerHTML = `Число правильных ответов игрока ${name} ${countAnswers}`;
 }
@@ -173,5 +176,15 @@ restart.addEventListener("click", () => {
   counterAnswers.classList.add('none');
   start.classList.remove('none');
   countSlide = 0;
-  counterAnswers = 0;
+  countAnswers = 0;
+  assignHandler();
+  activeButton();
 });
+
+function activeButton() {
+  const radio = container.querySelectorAll('.radio');
+  Array.from(radio).forEach(item => item.removeAttribute('disabled'));
+
+  const label = container.querySelectorAll('.answer');
+  Array.from(label).forEach(item => item.style.background = '#ffff2b');
+}
