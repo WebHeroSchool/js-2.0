@@ -1,190 +1,226 @@
-const slides = document.querySelectorAll('.question');
-const next = document.getElementById('next');
-const previous = document.getElementById('previous');
-const start = document.querySelector('.start-btn');
-const restart = document.querySelector('.restart');
-const container = document.querySelector('.container');
-const form = document.querySelector('.form');
-const formName = document.querySelector('.form__name');
-const buttonName = document.querySelector('.form__btn');
-const counterAnswers = document.getElementById('counterAnswers');
-const regex = /(^[A-Z]{1}[a-z]{1,9}( )?$)|(^[А-Я]{1}[а-я]{1,9}( )?$)/;
-let countSlide = 0;
-let countAnswers = 0;
-let timerShowQuestion;
-let timerCheckQuestion;
+class Quiz {
+  constructor(properties) {
+    this.preloader = properties.preloader;
+    this.correctRequestAnswers = properties.correctRequestAnswers;
+    this.allAnswersRequest = properties.allAnswersRequest;
+    this.correctDefaultAnswers = properties.correctDefaultAnswers;
+    this.questionRequest = properties.questionRequest;
+    this.requestLink = properties.requestLink;
+    this.checkResultBind = this.checkResult.bind(this);
+    this.start = properties.start;
+    this.next = properties.next;
+    this.previous = properties.previous;
+    this.slides = properties.slides;
+    this.restart = properties.restart;
+    this.container = properties.container;
+    this.form = properties.form;
+    this.formName = properties.formName;
+    this.buttonName = properties.buttonName;
+    this.counterAnswers = properties.counterAnswers;
+    this.regex = properties.regex;
+    this.countSlide = 0;
+    this.countAnswers = 0;
+    this.timerShowQuestion;
+    this.timerCheckQuestion;
+  }
 
-let result = [];
-let correctAns = [];
-let question = [];
-const allAnswers = [];
-let url = 'https://opentdb.com/api.php?amount=4&category=27&type=multiple';
-fetch(url)
-  .then(res => res.json())
-  .then(json => {
-    result = json.results;
-    result.forEach(obj => {
-      correctAns.push(obj.correct_answer);
-      question.push(obj.question);
-      allAnswers.push(...obj.incorrect_answers, obj.correct_answer);
-    });
+  makeRequest() {
+    fetch(this.requestLink)
+      .then(res => res.json())
+      .then(json => {
+        let result = [...json.results];
+        let quizCategory = result[0].category;
+        result.forEach(obj => {
+          this.correctRequestAnswers.push(obj.correct_answer);
+          this.questionRequest.push(obj.question);
+          this.allAnswersRequest.push(...obj.incorrect_answers, obj.correct_answer);
+        });
 
-    document.querySelector('.title').textContent = 'Викторина о животных';
+        document.querySelector('.title').textContent = `Quiz about ${quizCategory}`;
 
-    changeText(question, allAnswers);
-  })
-  .catch(err => console.log(err));
+        this.insertText(this.questionRequest, this.allAnswersRequest);
+        json.onload = this.preloader.classList.add('none');
+      })
+      .catch(err => console.log(err));
+  }
 
-  function changeText(arrQuestion, arrAnswer) {
-    const questionText = container.querySelectorAll('.question__title');
-    for(let i = 0; i < arrQuestion.length; i++) {
+  insertText(arrQuestion, arrAnswer) {
+    const questionText = this.container.querySelectorAll('.question__title');
+    for (let i = 0; i < arrQuestion.length; i++) {
       questionText[i].textContent = arrQuestion[i];
     }
 
-    const answerText = container.querySelectorAll('.answer');
-    const valueText = container.querySelectorAll('.radio');
-    for(let i = 0; i < arrAnswer.length; i++) {
+    const answerText = this.container.querySelectorAll('.answer');
+    const valueText = this.container.querySelectorAll('.radio');
+    for (let i = 0; i < arrAnswer.length; i++) {
       answerText[i].textContent = arrAnswer[i];
       valueText[i].value = arrAnswer[i];
     }
   }
 
-start.addEventListener("click", () => {
-  start.classList.add('none');
-  next.classList.remove('none');
-  previous.classList.remove('none');
-  switchQuestion(countAnswers);
-  console.log(countSlide + 1);
-})
-
-let assignHandler = () => {
-  Array.from(container.querySelectorAll('.question .question__answers'))
-    .forEach(answers => {
-      answers.addEventListener("click", checkResult);
-    })
-}
-
-assignHandler();
-
-function checkResult(event) {
-  let target = event.target;
-  if (target.tagName != 'LABEL') return;
-
-  disableButton(event);
-
-  const correctAnswers = ['В Африке', '55 км/ч', '9', '30 лет', ...correctAns];
-  let answer = target.previousElementSibling.value;
-  let isCorrect = correctAnswers.includes(answer);
-  if (isCorrect) {
-    target.style.background = "green";
-    countAnswers++;
-  } else {
-    target.style.background = "red";
+  assignHandlerAnswer() {
+    Array.from(this.container.querySelectorAll('.question .question__answers'))
+      .forEach(answers => {
+        answers.addEventListener("click", this.checkResultBind);
+      })
   }
 
-  event.currentTarget.removeEventListener("click", checkResult);
+  assignHandlerButton() {
+    this.start.addEventListener("click", this.startGame.bind(this));
+    this.next.addEventListener("click", this.switchNextQuestion.bind(this));
+    this.previous.addEventListener("click", this.switchPreviousQuestion.bind(this));
+    this.buttonName.addEventListener("click", this.eventButtonName.bind(this));
+    this.restart.addEventListener("click", this.eventRestart.bind(this));
+  }
 
-  clearTimeout(timerShowQuestion);
+  checkResult(event) {
+    let target = event.target;
+    if (target.tagName != 'LABEL') return;
 
-  timerCheckQuestion = setTimeout(switchNextQuestion, 1500);
-}
+    this.disableButton();
 
-function disableButton(event) {
-  if (event) {
-    const button = event.currentTarget.querySelectorAll('.radio');
-    button.forEach(item => item.setAttribute("disabled", "disabled"));
-  } else {
-    const disableBtn = slides[countSlide].querySelectorAll('.radio');
+    let answer = target.previousElementSibling.value;
+    let isCorrect = this.correctDefaultAnswers.includes(answer) || this.correctRequestAnswers.includes(answer);
+    if (isCorrect) {
+      target.style.background = "green";
+      this.countAnswers++;
+    } else {
+      target.style.background = "red";
+    }
+
+    clearTimeout(this.timerShowQuestion);
+
+    this.timerCheckQuestion = setTimeout(this.switchNextQuestion.bind(this), 1500);
+  }
+
+  disableButton() {
+    const disableBtn = this.slides[this.countSlide].querySelectorAll('.radio');
     Array.from(disableBtn).forEach(item => item.setAttribute("disabled", "disabled"));
-    const disableAnswers = slides[countSlide].querySelector('.question__answers');
-    disableAnswers.removeEventListener("click", checkResult);
+
+    const disableAnswers = this.slides[this.countSlide].querySelector('.question__answers');
+    disableAnswers.removeEventListener("click", this.checkResultBind);
+  }
+
+  startGame() {
+    this.start.classList.add('none');
+    this.next.classList.remove('none');
+    this.previous.classList.remove('none');
+    this.switchQuestion(this.countSlide);
+    console.log(`start ${this.countSlide + 1}`);
+  }
+
+  switchQuestion(switchedSlide) {
+    this.slides[this.countSlide].classList.remove('active');
+    this.slides[switchedSlide].classList.add('active');
+
+    if (this.timerShowQuestion !== null) clearTimeout(this.timerShowQuestion);
+    if (this.countSlide !== 3) {
+      this.timerShowQuestion = setTimeout(() => {
+        this.disableButton();
+        this.switchNextQuestion();
+      }, 10000);
+    }
+  }
+
+  switchNextQuestion() {
+    if (this.countSlide === 2) {
+      this.next.textContent = 'check';
+    }
+
+    if (this.countSlide === 3) {
+      this.next.classList.add('none');
+      this.previous.classList.add('none');
+    }
+
+    if (this.countSlide === 4) return;
+
+
+    this.switchQuestion(this.countSlide + 1);
+    this.countSlide++;
+    console.log(`next ${this.countSlide + 1}`);
+    clearTimeout(this.timerCheckQuestion);
+  }
+
+  switchPreviousQuestion() {
+    if (this.countSlide <= 0) {
+      return;
+    }
+
+    if (this.countSlide != 2) {
+      this.next.textContent = 'next';
+    }
+
+    this.switchQuestion(this.countSlide - 1);
+    this.countSlide--;
+    console.log(this.countSlide + 1);
+  }
+
+  eventButtonName() {
+    let name = this.formName.value;
+    let err = document.createElement('p');
+    if (!this.regex.test(name)) {
+      err.classList.add('error');
+      err.textContent = 'Введите корректное имя(содержит 2-10 символов и начинается с заглавной буквы)';
+      this.form.append(err);
+    } else {
+      this.slides[4].classList.remove('active');
+      this.showResult(name);
+      this.restart.classList.remove('none');
+    }
+    setTimeout(() => err.remove(), 2000);
+    this.formName.value = null;
+  }
+
+  showResult(name) {
+    this.counterAnswers.classList.remove('none');
+    this.counterAnswers.innerHTML = `Число правильных ответов игрока ${name} ${this.countAnswers}`;
+  }
+
+  eventRestart() {
+    this.restart.classList.add('none');
+    this.counterAnswers.classList.add('none');
+    this.start.classList.remove('none');
+    this.countSlide = 0;
+    this.countAnswers = 0;
+    this.assignHandlerAnswer();
+    this.activeButton();
+    this.correctRequestAnswers = [];
+    this.allAnswersRequest = [];
+    this.questionRequest = [];
+    this.makeRequest();
+    this.preloader.classList.remove('none');
+  }
+
+  activeButton() {
+    const radio = this.container.querySelectorAll('.radio');
+    Array.from(radio).forEach(item => item.removeAttribute('disabled'));
+
+    const label = this.container.querySelectorAll('.answer');
+    Array.from(label).forEach(item => item.style.background = '#ffff2b');
   }
 }
 
-next.addEventListener("click", switchNextQuestion);
-
-function switchNextQuestion() {
-  if (countSlide === 2) {
-    next.textContent = 'check';
-  }
-
-  if (countSlide === 3) {
-    next.classList.add('none');
-    previous.classList.add('none');
-  }
-
-  if (countSlide === 4) return;
-
-  switchQuestion(countSlide + 1);
-  countSlide++;
-  console.log(countSlide + 1);
-  clearTimeout(timerCheckQuestion);
+let animalQuiz = {
+  preloader: document.querySelector('.preloader'),
+  correctRequestAnswers: [],
+  questionRequest: [],
+  allAnswersRequest: [],
+  requestLink: 'https://opentdb.com/api.php?amount=4&category=27&type=multiple',
+  correctDefaultAnswers: ['В Африке', '55 км/ч', '9', '30 лет'],
+  start: document.querySelector('.start-btn'),
+  next: document.getElementById('next'),
+  previous: document.getElementById('previous'),
+  slides: document.querySelectorAll('.question'),
+  restart: document.querySelector('.restart'),
+  container: document.querySelector('.container'),
+  form: document.querySelector('.form'),
+  formName: document.querySelector('.form__name'),
+  buttonName: document.querySelector('.form__btn'),
+  counterAnswers: document.getElementById('counterAnswers'),
+  regex: /(^[A-Z]{1}[a-z]{1,9}( )?$)|(^[А-Я]{1}[а-я]{1,9}( )?$)/
 }
 
-previous.addEventListener("click", switchPreviousQuestion);
-
-function switchPreviousQuestion() {
-  if (countSlide <= 0) {
-    return;
-  }
-
-  if (countSlide != 2) {
-    next.textContent = 'next';
-  }
-
-  switchQuestion(countSlide - 1);
-  countSlide--;
-  console.log(countSlide + 1);
-}
-
-function switchQuestion(switchedSlide) {
-  slides[countSlide].classList.remove('active');
-  slides[switchedSlide].classList.add('active');
-
-  if (timerShowQuestion !== null) clearTimeout(timerShowQuestion);
-  if (countSlide !== 3) {
-    timerShowQuestion = setTimeout(() => {
-      disableButton();
-      switchNextQuestion();
-    }, 10000);
-  }
-}
-
-buttonName.addEventListener("click", () => {
-  let name = formName.value;
-  let err = document.createElement('p');
-  if (!regex.test(name)) {
-    err.classList.add('error');
-    err.textContent = 'Введите корректное имя(содержит 2-10 символов и начинается с заглавной буквы)';
-    form.append(err);
-  } else {
-    slides[4].classList.remove('active');
-    showResult(name);
-    restart.classList.remove('none');
-  }
-   setTimeout(() => err.remove(), 2000);
-   formName.value = null;
-});
-
-function showResult(name) {
-  counterAnswers.classList.remove('none');
-  counterAnswers.innerHTML = `Число правильных ответов игрока ${name} ${countAnswers}`;
-}
-
-restart.addEventListener("click", () => {
-  restart.classList.add('none');
-  counterAnswers.classList.add('none');
-  start.classList.remove('none');
-  countSlide = 0;
-  countAnswers = 0;
-  assignHandler();
-  activeButton();
-});
-
-function activeButton() {
-  const radio = container.querySelectorAll('.radio');
-  Array.from(radio).forEach(item => item.removeAttribute('disabled'));
-
-  const label = container.querySelectorAll('.answer');
-  Array.from(label).forEach(item => item.style.background = '#ffff2b');
-}
+let quiz = new Quiz(animalQuiz);
+quiz.makeRequest();
+quiz.assignHandlerAnswer();
+quiz.assignHandlerButton()
